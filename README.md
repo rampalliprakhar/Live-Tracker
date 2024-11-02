@@ -15,12 +15,13 @@ cd Live-Tracker
 ```
 
 ### Install dependencies
-```bash
-npm install
+```bash 
+npm i
 ```
-### Run the server
-```bash
-npx nodemon
+
+### Run it 
+```bash  
+npm run dev 
 ```
 
 Open http://localhost:3000 with your browser to see the application
