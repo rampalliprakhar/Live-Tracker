@@ -39,8 +39,8 @@ Open http://localhost:3000 with your browser to see the application
 ## Example:
 
 Provides location of user in real-time using socket io and leaflet js
-![alt text](image.png)
+![alt text](Live_Tracker.jpg)
 
 We can search locations:
-Example: I typed Florence, SC. The map will zoom to the desired area.
-![alt text](image-1.png)
+Example: I typed Charlotte, NC. The map will zoom to the desired area.
+![alt text](Search_Location.jpg)
