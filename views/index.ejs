@@ -11,17 +11,17 @@
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 <body>
-    <div id="map"></div>
-
-    <select id="mapStyle">
-        <option value="osm">OpenStreetMap</option>
-        <option value="satellite">Satellite</option>
-    </select>
-
-    <div id="sidebar">
-        <h3>Settings</h3>
-        <button id="toggleLocation">Toggle Location Sharing</button>
-        <div id="connectedUsers"></div>
+    <div class="container">
+        <div id="map"></div>
+        <div id="sidebar">
+            <h3>Settings</h3>
+            <select id="mapStyle">
+                <option value="osm">OpenStreetMap</option>
+            </select>
+            <button id="toggleLocation">Toggle Location Sharing</button>
+            <h4>Connected Users</h4>
+            <div id="connectedUsers"></div>
+        </div>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" 

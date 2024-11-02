@@ -4,11 +4,12 @@ const connectedUsers = [];
 let debounceTimer;
 const markers = {};
 
+// Function to send location to the server
 const sendLocation = (latitude, longitude) => {
-    socket.emit("send-location", {latitude, longitude});
+    socket.emit("send-location", { latitude, longitude });
 };
 
-
+// Function to handle geolocation
 const handleGeolocation = () => {
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
@@ -19,11 +20,24 @@ const handleGeolocation = () => {
             },
             (error) => {
                 console.error(error);
-                alert("Unable to retrieve your location. Please check your settings.");
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        alert("User denied the request for Geolocation.");
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        alert("Location information is unavailable.");
+                        break;
+                    case error.TIMEOUT:
+                        alert("The request to get user location timed out. Please try again.");
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        alert("An unknown error occurred.");
+                        break;
+                }
             },
             {
                 enableHighAccuracy: true,
-                timeout: 5000,
+                timeout: 10000, // Increased timeout to 10 seconds
                 maximumAge: 0,
             }
         );
@@ -46,55 +60,43 @@ const updateMarkers = (map, data) => {
     locationHistory.push({ id, latitude, longitude });
 
     if (markers[id]) {
-        markers[id].setLatLng([latitude, longitude]);
+        markers[id].setLatLng([latitude, longitude]); // Update existing marker
     } else {
-        markers[id] = L.marker([latitude, longitude]).addTo(map);
+        markers[id] = L.marker([latitude, longitude]).addTo(map); // Add new marker
     }
 };
 
-// Customize map based on the user preferences
-const mapStyles = {
-    osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    satellite: "https://{s}.satellite.openstreetmap.org/{z}/{x}/{y}.png"
-};
-
-document.getElementById("mapStyle").addEventListener("change", (event) => {
-    const selectedStyle = event.target.value;
-    L.tileLayer(mapStyles[selectedStyle]).addTo(map);
-});
-
 // Remove markers when user disconnects
 const removeMarker = (map, id) => {
-    if(markers[id]){
+    if (markers[id]) {
         map.removeLayer(markers[id]);
         delete markers[id];
     }
 };
 
-// Display location history
-const displayLocationHistory = (map) => {
-    const polyline = L.polyline(locationHistory.map(loc => [loc.latitude, loc.longitude]), { color: 'blue' }).addTo(map);
-};
-
+// Update the list of connected users
 const updateConnectedUsers = () => {
     document.getElementById("connectedUsers").innerHTML = connectedUsers.join(", ");
 };
 
 // Execution
 const map = initializeMap();
-
 handleGeolocation();
-// Receiving location
+
+// Receiving location updates from the server
 socket.on("receive-location", (data) => updateMarkers(map, data));
-// Removes the pointer from the location when user leaves the website
-socket.on("user-disconnected", (id)=> removeMarker(map, id));
-// Alert user when online
+
+// Remove marker when user disconnects
+socket.on("user-disconnected", (id) => removeMarker(map, id));
+
+// Alert user when another user comes online
 socket.on("user-online", (data) => {
     alert(`User ${data.id} is now online!`);
     connectedUsers.push(data.id);
     updateConnectedUsers();
 });
-// Alert when the user leaves
+
+// Alert when a user goes offline
 socket.on("user-offline", (data) => {
     alert(`User ${data.id} has gone offline.`);
     const index = connectedUsers.indexOf(data.id);
@@ -103,5 +105,6 @@ socket.on("user-offline", (data) => {
     }
     updateConnectedUsers();
 });
-// Add geocoder control
+
+// Add geocoder control to the map
 L.Control.geocoder().addTo(map);

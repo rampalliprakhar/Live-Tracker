@@ -15,6 +15,11 @@ io.on("connection", (socket) => {
     console.log("New user connected: " + socket.id);
     socket.broadcast.emit("user-online", { id: socket.id }); // Notify others when a user connects
 
+    // Listen for location updates from the client
+    socket.on("send-location", (data) => {
+        socket.broadcast.emit("receive-location", { id: socket.id, ...data }); // Broadcast location to others
+    });
+
     socket.on("disconnect", () => {
         console.log("User disconnected: " + socket.id);
         socket.broadcast.emit("user-offline", { id: socket.id }); // Notify others when a user disconnects
@@ -24,8 +29,9 @@ io.on("connection", (socket) => {
 // Render the main page
 app.get("/", (req, res) => {
     res.render("index");
-})
+});
 
+// Start the server
 server.listen(3000, () => {
     console.log("Server is running on port 3000");
 });
