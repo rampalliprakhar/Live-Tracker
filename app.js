@@ -12,13 +12,12 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Handle socket connections
 io.on("connection", (socket) => {
-    console.log("New user connected: " + socket.id); // Log connection
-    socket.on("send-location", (data) => {
-        io.emit("receive-location", { id: socket.id, ...data });
-    });
+    console.log("New user connected: " + socket.id);
+    socket.broadcast.emit("user-online", { id: socket.id }); // Notify others when a user connects
+
     socket.on("disconnect", () => {
-        console.log("User disconnected: " + socket.id); // Log disconnection
-        io.emit("user-disconnected", socket.id);
+        console.log("User disconnected: " + socket.id);
+        socket.broadcast.emit("user-offline", { id: socket.id }); // Notify others when a user disconnects
     });
 });
 
