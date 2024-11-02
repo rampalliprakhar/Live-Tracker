@@ -8,6 +8,7 @@ if(navigator.geolocation){
         },
         (error) => {
             console.error(error);
+            alert("Unable to retrieve your location. Please check your settings."); // User feedback
         },
         {
             enableHighAccuracy: true,

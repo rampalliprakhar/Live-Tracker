@@ -13,12 +13,14 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // accept location
 io.on("connection", function(socket) {
+    console.log("New user connected: " + socket.id); // Log connection
     socket.on("send-location", function (data){
         io.emit("receive-location", {id: socket.id, ...data});
     });
     socket.on("disconnect", function(){
+        console.log("User disconnected: " + socket.id); // Log disconnection
         io.emit("user-disconnected", socket.id);
-    })
+    });
 });
 
 app.get("/", function(req, res) {
