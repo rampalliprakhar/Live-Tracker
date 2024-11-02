@@ -5,12 +5,14 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
+    flex-direction: column; /* Stack elements vertically */
     height: 100vh;
 }
 
 .container {
     display: flex;
     flex: 1;
+    flex-direction: row; /* Keep map and sidebar side by side */
 }
 
 #map {
@@ -56,4 +58,16 @@ button:hover {
     border-radius: 4px;
     max-height: 200px;
     overflow-y: auto;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Stack map and sidebar on smaller screens */
+    }
+
+    #sidebar {
+        width: 100%; /* Full width on mobile */
+        box-shadow: none; /* Remove shadow on mobile */
+    }
 }
