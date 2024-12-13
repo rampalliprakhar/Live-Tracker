@@ -10,27 +10,18 @@ const io = socket(server);
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
-let connectedUsers = {};    // store connected users
-
 // Handle socket connections
 io.on("connection", (socket) => {
     console.log("New user connected: " + socket.id);
-    
-    // Add users to connectedUsers
-    connectedUsers[socket.id] = {id: socket.id, location:null};
+    socket.broadcast.emit("user-online", { id: socket.id }); // Notify others when a user connects
 
-    // Notify users when a new user connects
-    socket.broadcast.emit("user-online", { id: socket.id });
-    
     // Listen for location updates from the client
     socket.on("send-location", (data) => {
-        connectedUsers[socket.id].location = data;
         socket.broadcast.emit("receive-location", { id: socket.id, ...data }); // Broadcast location to others
     });
 
     socket.on("disconnect", () => {
         console.log("User disconnected: " + socket.id);
-        delete connectedUsers[socket.id]; // Remove the user from the connectedUsers
         socket.broadcast.emit("user-offline", { id: socket.id }); // Notify others when a user disconnects
     });
 });

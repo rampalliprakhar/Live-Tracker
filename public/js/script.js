@@ -18,7 +18,7 @@ const handleGeolocation = () => {
             (position) => {
                 const { latitude, longitude } = position.coords;
                 clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => sendLocation(latitude, longitude), 1000);
+                debounceTimer = setTimeout(() => sendLocation(latitude, longitude), 500);
             },
             (error) => {
                 console.error(error);
@@ -50,13 +50,16 @@ const handleGeolocation = () => {
 
 // Toggle location sharing
 document.getElementById("toggleLocation").addEventListener("click", () => {
-    isLocationSharing = !isLocationSharing; // Toggle the flag
+    const button = document.getElementById("toggleLocation");
+    isLocationSharing = !isLocationSharing;
     if (isLocationSharing) {
         handleGeolocation(); // Start sharing location
-        document.getElementById("toggleLocation").innerText = "Stop Location Sharing";
+        button.innerText = "Stop Location Sharing";
+        button.disabled = false; // Disable button while waiting for location
     } else {
-        navigator.geolocation.clearWatch(watchId); // Clear the watch
-        document.getElementById("toggleLocation").innerText = "Start Location Sharing";
+        navigator.geolocation.clearWatch(watchId); // Stop sharing location
+        button.innerText = "Start Location Sharing";
+        button.disabled = false;
     }
 });
 
@@ -71,7 +74,7 @@ const initializeMap = () => {
 
 // Update markers on the map
 const updateMarkers = (map, data) => {
-    const { id, latitude, longitude } = data; // Exclude profile for this implementation
+    const { id, latitude, longitude } = data;
     map.setView([latitude, longitude]);
     locationHistory.push({ id, latitude, longitude });
 
