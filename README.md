@@ -4,6 +4,9 @@
 - This app enables users to share and view live GPS locations on an interactive map. 
 - It features a seamless user experience for real-time location updates, with a focus on simplicity, performance, and scalability.
 
+# Live Link:
+https://live-tracker-06hi.onrender.com/
+
 ## Screenshot:
 
 Provides location of user in real-time using socket io and leaflet js
