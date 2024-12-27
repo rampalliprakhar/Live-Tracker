@@ -51,15 +51,24 @@ const handleGeolocation = () => {
 // Toggle location sharing
 document.getElementById("toggleLocation").addEventListener("click", () => {
     const button = document.getElementById("toggleLocation");
+    
+    // Temporarily disable to avoid multiple clicks
+    button.disabled = true;
+
+    // Toggle location sharing
     isLocationSharing = !isLocationSharing;
+
     if (isLocationSharing) {
         handleGeolocation(); // Start sharing location
         button.innerText = "Stop Location Sharing";
         button.disabled = false; // Disable button while waiting for location
     } else {
-        navigator.geolocation.clearWatch(watchId); // Stop sharing location
-        button.innerText = "Start Location Sharing";
-        button.disabled = false;
+        if(watchId){
+            navigator.geolocation.clearWatch(watchId); // Stop sharing location
+            watchId = null;                            // Clear the watch ID
+        }
+        button.innerText = "Start Location Sharing";    // Reset button text
+        button.disabled = false;                     // Re-enable the button
     }
 });
 
@@ -75,9 +84,14 @@ const initializeMap = () => {
 // Update markers on the map
 const updateMarkers = (map, data) => {
     const { id, latitude, longitude } = data;
-    map.setView([latitude, longitude]);
+
+    // Update the map view to center on the user's location
+    map.setView([latitude, longitude], map.getZoom());
+    
+    // Store the location history
     locationHistory.push({ id, latitude, longitude });
 
+    // Update or create a new marker for the user
     if (markers[id]) {
         markers[id].setLatLng([latitude, longitude]); // Update existing marker
     } else {
@@ -89,8 +103,8 @@ const updateMarkers = (map, data) => {
 // Remove markers when user disconnects
 const removeMarker = (map, id) => {
     if (markers[id]) {
-        map.removeLayer(markers[id]);
-        delete markers[id];
+        map.removeLayer(markers[id]);   // Remove the marker from the map
+        delete markers[id];             // Delete the marker from the markers object
     }
 };
 

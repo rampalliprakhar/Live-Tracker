@@ -13,16 +13,22 @@ app.use(express.static(path.join(__dirname, "public")));
 // Handle socket connections
 io.on("connection", (socket) => {
     console.log("New user connected: " + socket.id);
-    socket.broadcast.emit("user-online", { id: socket.id }); // Notify others when a user connects
+
+    // Notify others when a user connects
+    socket.broadcast.emit("user-online", { id: socket.id }); 
 
     // Listen for location updates from the client
     socket.on("send-location", (data) => {
-        socket.broadcast.emit("receive-location", { id: socket.id, ...data }); // Broadcast location to others
+        // console.log(`Location received from ${socket.id}: `, data)
+        // Broadcast location to others
+        io.emit("receive-location", { id: socket.id, ...data }); 
     });
 
+    // Handle user disconnection
     socket.on("disconnect", () => {
         console.log("User disconnected: " + socket.id);
-        socket.broadcast.emit("user-offline", { id: socket.id }); // Notify others when a user disconnects
+        // Notify others when a user disconnects
+        socket.broadcast.emit("user-offline", { id: socket.id }); 
     });
 });
 
