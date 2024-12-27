@@ -18,7 +18,7 @@ const handleGeolocation = () => {
             (position) => {
                 const { latitude, longitude } = position.coords;
                 clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => sendLocation(latitude, longitude), 500);
+                debounceTimer = setTimeout(() => sendLocation(latitude, longitude), 1000);
             },
             (error) => {
                 console.error(error);
@@ -39,7 +39,7 @@ const handleGeolocation = () => {
             },
             {
                 enableHighAccuracy: true, // Request high accuracy
-                timeout: 20000, // Increased timeout to 20 seconds
+                timeout: 50000, // Increased timeout to 50 seconds
                 maximumAge: 0,
             }
         );
