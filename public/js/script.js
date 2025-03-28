@@ -5,6 +5,7 @@ const markers = {};
 let debounceTimer;
 let watchId; // Variable to store the watch ID
 let isLocationSharing = false; // Track location sharing status
+const userPaths = {}; // Store user paths
 
 // Function to send location to the server
 const sendLocation = (latitude, longitude) => {
@@ -89,11 +90,24 @@ button.innerHTML = '<span class="spinner"></span> Getting Location...';
 const updateMarkers = (map, data) => {
     const { id, latitude, longitude } = data;
 
-    // Update the map view to center on the user's location
-    map.setView([latitude, longitude], map.getZoom());
-    
-    // Store the location history
-    locationHistory.push({ id, latitude, longitude });
+    // Path array for new user
+    if (!userPaths[id]) {
+        userPaths[id] = [];
+    }
+
+    userPaths[id].push([latitude, longitude]);
+
+    if (userPaths[id].length > 1) {
+        if (markers[id].polyline) {
+            markers[id].polyline.setLatLngs(userPaths[id]); // Update the polyline
+        } else {
+            markers[id].polyline = L.polyline(userPaths[id], { 
+                color: "#" + Math.floor(Math.random() * 16777215).toString(16),
+                weight: 3,
+                opacity: 0.7
+            }).addTo(map);
+        }
+    }
 
     // Update or create a new marker for the user
     if (markers[id]) {
@@ -102,13 +116,23 @@ const updateMarkers = (map, data) => {
         // Create a marker and add it to the map
         markers[id] = L.marker([latitude, longitude]).addTo(map);
     }
+
+    // Update the map view to center on the user's location
+    map.setView([latitude, longitude], map.getZoom());
+    
+    // // Store the location history
+    // locationHistory.push({ id, latitude, longitude });
 };
 
 // Remove markers when user disconnects
 const removeMarker = (map, id) => {
     if (markers[id]) {
+        if (markers[id].polyline) {
+            map.removeLayer(markers[id].polyline); // Remove the polyline
+        }
         map.removeLayer(markers[id]);   // Remove the marker from the map
         delete markers[id];             // Delete the marker from the markers object
+        delete userPaths[id];            // Delete the user's path
     }
 };
 
@@ -147,4 +171,28 @@ socket.on("user-offline", (data) => {
 });
 
 // Add geocoder control to the map
-L.Control.geocoder().addTo(map);
+L.Control.geocoder().addTo(map)
+    .on('markgeocode', function(e) {
+        const searchedLocation = e.geocode.center;
+        const userId = socket.id;
+
+        // Obtain user's current location
+        if (markers[userId]) {
+            const currentLocation = markers[userId].getLatLng();
+
+            // Create path from user's current location to the searched location
+            const routePath = L.polyline([
+                [currentLocation.lat, currentLocation.lng],
+                [searchedLocation.lat, searchedLocation.lng]
+            ], {
+                color: '#FF4444',
+                weight: 4,
+                dashArray: '10, 10',
+                opacity: 0.8
+            }).addTo(map);
+
+            // Store reference to the route path
+            markers[userId].searchRoute = routePath;
+        }
+    })
+;
