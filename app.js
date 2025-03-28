@@ -37,10 +37,24 @@ app.get("/", (req, res) => {
     res.render("index");
 });
 
+// Render to the help page
+app.get("/help", (req, res) => {
+    res.render("help");
+});
+
 // Error handling
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
+});
+
+// Headers
+app.use((req, res, next) => {
+    res.setHeader(
+        'Content-Security-Policy',
+        "default-src 'self'; font-src 'self' data: https:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:;"
+    );
+    next();
 });
 
 // Start the server
