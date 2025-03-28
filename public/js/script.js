@@ -81,6 +81,10 @@ const initializeMap = () => {
     return map;
 };
 
+// Loading state
+const button = document.getElementById("toggleLocation");
+button.innerHTML = '<span class="spinner"></span> Getting Location...';
+
 // Update markers on the map
 const updateMarkers = (map, data) => {
     const { id, latitude, longitude } = data;
