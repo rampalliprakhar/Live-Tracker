@@ -7,17 +7,35 @@ let watchId; // Variable to store the watch ID
 let isLocationSharing = false; // Track location sharing status
 const userPaths = {}; // Store user paths
 
+// Function for light and dark mode
+const toggleTheme = document.getElementById('themeToggle');
+toggleTheme.addEventListener('click', () => {
+    document.body.classList.toggle('dark-theme');
+    const isDark = document.body.classList.contains('dark-theme');
+    toggleTheme.textContent = isDark ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+});
+
 // Function to send location to the server
 const sendLocation = (latitude, longitude) => {
     socket.emit("send-location", { latitude, longitude });
 };
 
+const trackingData = analytics;
+
+document.getElementById('unitToggle').addEventListener('click', () => {
+    trackingData.toggleUnits();
+    updateAnalyticsDisplay();
+});
+
 // Function to handle geolocation
 const handleGeolocation = () => {
     if (navigator.geolocation) {
+        trackingData.startTracking();
         watchId = navigator.geolocation.watchPosition(
             (position) => {
                 const { latitude, longitude } = position.coords;
+                trackingData.updateDistance({ lat: latitude, lng: longitude});
+                updateDataDisplay();
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(() => sendLocation(latitude, longitude), 1000);
             },
@@ -112,9 +130,12 @@ const updateMarkers = (map, data) => {
     // Update or create a new marker for the user
     if (markers[id]) {
         markers[id].setLatLng([latitude, longitude]); // Update existing marker
+        markers[id].setIcon(markerIcons.active);
     } else {
         // Create a marker and add it to the map
-        markers[id] = L.marker([latitude, longitude]).addTo(map);
+        markers[id] = L.marker([latitude, longitude], {
+            icon: markerIcons.default
+        }).addTo(map);
     }
 
     // Update the map view to center on the user's location
@@ -136,9 +157,29 @@ const removeMarker = (map, id) => {
     }
 };
 
+const updateDataDisplay = () => {
+    const stats = trackingData.generateReport();
+    document.getElementById('total-distance').textContent = `${stats.totalDistance} km`;
+    document.getElementById('tracking-duration').textContent = stats.duration;
+    document.getElementById('avg-speed').textContent = `${stats.averageSpeed} km/h`;
+};
+
+const updateAnalyticsDisplay = () => {
+    const stats = trackingData.generateReport();
+    document.getElementById('total-distance').textContent = stats.totalDistance;
+    document.getElementById('tracking-duration').textContent = stats.duration;
+    document.getElementById('avg-speed').textContent = stats.averageSpeed;
+};
+
 // Update the list of connected users
 const updateConnectedUsers = () => {
-    document.getElementById("connectedUsers").innerHTML = connectedUsers.join(", ");
+    const usersList = document.getElementById('connectedUsers');
+    usersList.innerHTML = users.map(user => `
+        <div class="user-item">
+            <span class="user-status"></span>
+            <span>${user}</span>
+        </div>
+    `).join('');
 };
 
 // Execution

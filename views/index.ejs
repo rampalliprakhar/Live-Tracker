@@ -4,36 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Tracker</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" 
-    integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" 
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <div class="container">
         <div id="map"></div>
         <div id="sidebar">
-            <h3>Settings</h3>
-            <select id="mapStyle">
-                <option value="osm">OpenStreetMap</option>
-            </select>
-            <button id="toggleLocation">Toggle Location Sharing</button>
-            <h4>Connected Users</h4>
-            <div id="connectedUsers"></div>
+            <div class="sidebar-header">
+                <h3>Live Tracker</h3>
+                <button id="themeToggle" class="theme-toggle">🌓</button>
+            </div>
+            
+            <div class="control-panel">
+                <select id="mapStyle" class="select-style">
+                    <option value="osm">OpenStreetMap</option>
+                    <option value="satellite">Satellite View</option>
+                </select>
+                
+                <button id="toggleLocation" class="primary-button">
+                    Start Tracking
+                </button>
+                
+                <div class="users-section">
+                    <h4>Connected Users</h4>
+                    <div id="connectedUsers" class="users-list"></div>
+                </div>
+            </div>
+
+            <div id="analytics-panel" class="analytics-section">
+                <div class="analytics-header">
+                    <h4>Tracking Statistics</h4>
+                    <button id="unitToggle" class="unit-toggle">km/mi</button>
+                </div>
+                
+                <div class="stat-card">
+                    <span class="stat-label">Distance</span>
+                    <span id="total-distance" class="stat-value">0.00 </span>
+                </div>
+                
+                <div class="stat-card">
+                    <span class="stat-label">Duration</span>
+                    <span id="tracking-duration" class="stat-value">00:00:00</span>
+                </div>
+                
+                <div class="stat-card">
+                    <span class="stat-label">Speed</span>
+                    <span id="avg-speed" class="stat-value">0.0 km/h</span>
+                </div>
+            </div>
+
             <a href="/help" class="help-button">Need Help?</a>
         </div>
     </div>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" 
-    integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" 
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" 
-    integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" 
-    crossorigin="anonymous"></script>
-    
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="/js/analytics.js"></script>
+    <script src="/js/marker.js"></script>
     <script src="/js/script.js"></script>
 </body>
 </html>
